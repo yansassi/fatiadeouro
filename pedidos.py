@@ -16,18 +16,40 @@ def show_pedidos():
         with st.form("form_novo_pedido"):
             st.subheader("📋 Novo Pedido")
             cliente = st.text_input("Cliente")
-            produtos = st.text_input("Produtos (separados por vírgula)")
-            total = st.number_input("Total (Gs)", step=1000.0, min_value=0.0)
+
+            try:
+                lista_produtos = supabase.table("produtos").select("*").execute().data
+            except Exception as e:
+                st.error(f"Erro ao buscar produtos: {e}")
+                return
+
+            nomes = [f"{p['nome']} - {p['preco']}" for p in lista_produtos]
+            nome_para_produto = {f"{p['nome']} - {p['preco']}": p for p in lista_produtos}
+
+            selecionados = st.multiselect("Selecionar Produtos", nomes)
+
+            total = 0
+            if selecionados:
+                st.markdown("### 🧾 Produtos Selecionados")
+                for item in selecionados:
+                    produto = nome_para_produto[item]
+                    st.write(f"- {produto['nome']} – {produto['preco']} Gs")
+                    total += produto["preco"]
+                st.markdown(f"### 💰 Total: `{total}` Gs")
+            else:
+                st.info("Nenhum produto selecionado.")
+
             status = st.selectbox("Status", ["Aguardando", "Em Preparo", "Finalizado"])
             data = st.date_input("Data do Pedido")
             enviar = st.form_submit_button("Registrar Pedido")
 
             if enviar:
-                if cliente and produtos:
+                if cliente and selecionados:
                     try:
+                        nomes_formatados = ", ".join([nome_para_produto[x]["nome"] for x in selecionados])
                         supabase.table("pedidos").insert({
                             "cliente": cliente,
-                            "produtos": produtos,
+                            "produtos": nomes_formatados,
                             "total": total,
                             "status": status,
                             "data": str(data)
