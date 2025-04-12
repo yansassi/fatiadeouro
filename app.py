@@ -5,61 +5,75 @@ import pedidos
 
 st.set_page_config(page_title="Fatia de Ouro", layout="wide")
 
-# CSS para o layout moderno
+# Estilização geral para dashboard com barra lateral esquerda
 st.markdown("""
 <style>
 body {
     background-color: #1e1e2f;
-    color: white;
     font-family: 'Segoe UI', sans-serif;
+    color: white;
 }
-.navbar {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    padding: 1rem 0;
-    background-color: #111827;
-    border-bottom: 1px solid #333;
-    position: sticky;
+.sidebar-container {
+    position: fixed;
     top: 0;
+    left: 0;
+    width: 220px;
+    height: 100%;
+    background-color: #111827;
+    padding-top: 2rem;
+    border-right: 1px solid #2c2f3a;
     z-index: 1000;
 }
-.navbar button {
+.sidebar-container h2 {
+    color: white;
+    text-align: center;
+    font-size: 20px;
+    margin-bottom: 2rem;
+}
+.sidebar-button {
+    display: block;
     background-color: transparent;
     color: white;
     border: none;
-    font-weight: bold;
-    font-size: 1.1rem;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+    text-align: left;
+    padding: 0.8rem 1.5rem;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background 0.2s;
 }
-.navbar button:hover {
+.sidebar-button:hover {
     background-color: #374151;
     color: #60a5fa;
-    border-radius: 6px;
+}
+.main-container {
+    margin-left: 240px;
+    padding: 2rem;
 }
 </style>
+<div class="sidebar-container">
+    <h2>🍕 Fatia de Ouro</h2>
+    <form action="" method="get">
+        <button name="page" value="Clientes" class="sidebar-button">👤 Clientes</button>
+        <button name="page" value="Produtos" class="sidebar-button">📦 Produtos</button>
+        <button name="page" value="Pedidos" class="sidebar-button">🧾 Pedidos</button>
+    </form>
+</div>
 """, unsafe_allow_html=True)
 
-if "pagina" not in st.session_state:
-    st.session_state.pagina = "Clientes"
+# Estado da navegação
+query_params = st.experimental_get_query_params()
+page = query_params.get("page", ["Clientes"])[0]
 
-col1, col2, col3 = st.columns([1,1,1])
-with st.container():
-    st.markdown('<div class="navbar">', unsafe_allow_html=True)
-    if col1.button("Clientes"):
-        st.session_state.pagina = "Clientes"
-    if col2.button("Produtos"):
-        st.session_state.pagina = "Produtos"
-    if col3.button("Pedidos"):
-        st.session_state.pagina = "Pedidos"
-    st.markdown('</div>', unsafe_allow_html=True)
+# Container principal
+st.markdown('<div class="main-container">', unsafe_allow_html=True)
+st.title(f"{page}")
 
-# Exibe a página selecionada
-if st.session_state.pagina == "Clientes":
+if page == "Clientes":
     clientes.show_clientes()
-elif st.session_state.pagina == "Produtos":
+elif page == "Produtos":
     produtos.show_produtos()
-elif st.session_state.pagina == "Pedidos":
+elif page == "Pedidos":
     pedidos.show_pedidos()
+
+st.markdown('</div>', unsafe_allow_html=True)
