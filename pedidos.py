@@ -57,7 +57,7 @@ def show_pedidos():
                         try:
                             supabase.table("pedidos").update({"status": novo_status}).eq("id", pedido["id"]).execute()
                             st.success("Status atualizado!")
-                            st.experimental_rerun()
+                            st.rerun()
                         except Exception as e:
                             st.error(f"Erro ao atualizar status: {e}")
 
