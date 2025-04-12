@@ -40,27 +40,19 @@ def show_pedidos():
 
         for i, pedido in enumerate(filtrados):
             with colunas[i % 3]:
-                with st.container():
-                    st.markdown(
-                        f'''
-<div style="border:1px solid #444; border-radius:10px; padding:1rem; margin-bottom:1rem; background-color:#1f2937;">
-<strong>Cliente:</strong> {pedido.get("cliente", "")}<br>
-<strong>Total:</strong> {pedido.get("total", "")}<br>
-<strong>Status:</strong> {pedido.get("status", "")}<br>
-<strong>Data:</strong> {pedido.get("data", "")}<br>
-<strong>Produtos:</strong> {pedido.get("produtos", "")}<br><br>
-</div>
-                        ''',
-                        unsafe_allow_html=True
-                    )
-
+                with st.container(border=True):
+                    st.markdown(f"**Cliente:** {pedido.get('cliente', '')}")
+                    st.markdown(f"**Total:** {pedido.get('total', '')}")
+                    st.markdown(f"**Status:** {pedido.get('status', '')}")
+                    st.markdown(f"**Data:** {pedido.get('data', '')}")
+                    st.markdown(f"**Produtos:** {pedido.get('produtos', '')}")
+                    st.markdown("---")
                     novo_status = st.selectbox(
                         "Alterar Status",
                         ["Aguardando", "Em Preparo", "Finalizado"],
                         index=["Aguardando", "Em Preparo", "Finalizado"].index(pedido["status"]),
                         key=f"status_{pedido['id']}"
                     )
-
                     if novo_status != pedido["status"]:
                         try:
                             supabase.table("pedidos").update({"status": novo_status}).eq("id", pedido["id"]).execute()
