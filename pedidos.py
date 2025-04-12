@@ -8,9 +8,13 @@ def show_pedidos():
 
     if "mostrar_formulario" not in st.session_state:
         st.session_state.mostrar_formulario = False
+    if "itens_selecionados" not in st.session_state:
+        st.session_state.itens_selecionados = []
 
     if st.button("🟢 ABRIR PEDIDO"):
         st.session_state.mostrar_formulario = not st.session_state.mostrar_formulario
+        if not st.session_state.mostrar_formulario:
+            st.session_state.itens_selecionados = []
 
     if st.session_state.mostrar_formulario:
         with st.form("form_novo_pedido"):
@@ -26,27 +30,33 @@ def show_pedidos():
             nomes = [f"{p['nome']} - {p['preco']}" for p in lista_produtos]
             nome_para_produto = {f"{p['nome']} - {p['preco']}": p for p in lista_produtos}
 
-            selecionados = st.multiselect("Selecionar Produtos", nomes)
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                produto_selecionado = st.selectbox("Selecionar Produto", nomes)
+            with col2:
+                if st.form_submit_button("Adicionar"):
+                    if produto_selecionado and produto_selecionado not in st.session_state.itens_selecionados:
+                        st.session_state.itens_selecionados.append(produto_selecionado)
 
             total = 0
-            if selecionados:
+            if st.session_state.itens_selecionados:
                 st.markdown("### 🧾 Produtos Selecionados")
-                for item in selecionados:
+                for item in st.session_state.itens_selecionados:
                     produto = nome_para_produto[item]
-                    st.write(f"- {produto['nome']} – {produto['preco']} Gs")
+                    st.markdown(f"- {produto['nome']} – `{produto['preco']} Gs`")
                     total += produto["preco"]
                 st.markdown(f"### 💰 Total: `{total}` Gs")
             else:
-                st.info("Nenhum produto selecionado.")
+                st.info("Nenhum produto adicionado ainda.")
 
             status = st.selectbox("Status", ["Aguardando", "Em Preparo", "Finalizado"])
             data = st.date_input("Data do Pedido")
-            enviar = st.form_submit_button("Registrar Pedido")
+            registrar = st.form_submit_button("Registrar Pedido")
 
-            if enviar:
-                if cliente and selecionados:
+            if registrar:
+                if cliente and st.session_state.itens_selecionados:
                     try:
-                        nomes_formatados = ", ".join([nome_para_produto[x]["nome"] for x in selecionados])
+                        nomes_formatados = ", ".join([nome_para_produto[x]["nome"] for x in st.session_state.itens_selecionados])
                         supabase.table("pedidos").insert({
                             "cliente": cliente,
                             "produtos": nomes_formatados,
@@ -56,6 +66,7 @@ def show_pedidos():
                         }).execute()
                         st.success("Pedido registrado com sucesso!")
                         st.session_state.mostrar_formulario = False
+                        st.session_state.itens_selecionados = []
                         st.rerun()
                     except Exception as e:
                         st.error(f"Erro ao registrar pedido: {e}")
