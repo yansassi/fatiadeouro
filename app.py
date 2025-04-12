@@ -5,7 +5,7 @@ import pedidos
 
 st.set_page_config(page_title="Fatia de Ouro", layout="wide")
 
-# Estilo para layout moderno com sidebar e margem no topo
+# Estilo corrigido com padding superior na sidebar para não cortar a logo
 st.markdown("""
 <style>
 body {
@@ -20,7 +20,7 @@ body {
     width: 220px;
     height: 100%;
     background-color: #111827;
-    padding-top: 2rem;
+    padding-top: 3.5rem;
     border-right: 1px solid #2c2f3a;
     z-index: 1000;
 }
@@ -48,7 +48,7 @@ body {
 }
 .main-container {
     margin-left: 240px;
-    padding: 3.5rem 2rem 2rem 2rem;
+    padding: 4rem 2rem 2rem 2rem;
 }
 </style>
 <div class="sidebar-container">
@@ -61,11 +61,11 @@ body {
 </div>
 """, unsafe_allow_html=True)
 
-# Navegação por parâmetros atualizados
+# Página ativa
 query_params = st.query_params
 page = query_params.get("page", "Clientes")
 
-# Container do conteúdo principal com margem no topo
+# Conteúdo com margem para o novo topo
 st.markdown('<div class="main-container">', unsafe_allow_html=True)
 st.title(page)
 
