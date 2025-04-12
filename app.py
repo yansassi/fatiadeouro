@@ -5,7 +5,7 @@ import pedidos
 
 st.set_page_config(page_title="Fatia de Ouro", layout="wide")
 
-# Estilização geral para dashboard com barra lateral esquerda
+# Estilo para layout moderno com sidebar e margem no topo
 st.markdown("""
 <style>
 body {
@@ -48,7 +48,7 @@ body {
 }
 .main-container {
     margin-left: 240px;
-    padding: 2rem;
+    padding: 3.5rem 2rem 2rem 2rem;
 }
 </style>
 <div class="sidebar-container">
@@ -61,13 +61,13 @@ body {
 </div>
 """, unsafe_allow_html=True)
 
-# Estado da navegação
-query_params = st.experimental_get_query_params()
-page = query_params.get("page", ["Clientes"])[0]
+# Navegação por parâmetros atualizados
+query_params = st.query_params
+page = query_params.get("page", "Clientes")
 
-# Container principal
+# Container do conteúdo principal com margem no topo
 st.markdown('<div class="main-container">', unsafe_allow_html=True)
-st.title(f"{page}")
+st.title(page)
 
 if page == "Clientes":
     clientes.show_clientes()
