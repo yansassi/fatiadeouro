@@ -106,10 +106,13 @@ def show_pedidos():
             with colunas[i % 3]:
                 with st.container(border=True):
                     st.markdown(f"**Cliente:** {pedido.get('cliente', '')}")
-                    st.markdown(f"**Total:** R${pedido.get('total', 0):.2f}")
-                    st.markdown(f"**Status:** {pedido.get('status', '')}")
                     st.markdown(f"**Data:** {pedido.get('data', '')}")
-                    st.markdown(f"**Produtos:** {pedido.get('produtos', '')}")
+                    st.markdown(f"**Status:** {pedido.get('status', '')}")
+                    st.markdown("**Produtos:**")
+                    produtos_lista = [x.strip() for x in pedido.get("produtos", "").split(",")]
+                    for produto in produtos_lista:
+                        st.markdown(f"<li style='color:limegreen;'>• {produto}</li>", unsafe_allow_html=True)
+                    st.markdown(f"<div style='margin-top: 0.5rem;'><strong>💰 Total:</strong> <span style='background-color:#16a34a; color:white; padding:4px 8px; border-radius:6px;'>R${pedido.get('total', 0):.2f}</span></div>", unsafe_allow_html=True)
                     st.markdown("---")
                     novo_status = st.selectbox(
                         "Alterar Status",
