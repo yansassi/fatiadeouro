@@ -6,7 +6,39 @@ def show_pedidos():
     st.title("🧾 Pedidos")
     supabase = get_supabase()
 
-    st.button("🟢 ABRIR PEDIDO", type="primary")
+    if "mostrar_formulario" not in st.session_state:
+        st.session_state.mostrar_formulario = False
+
+    if st.button("🟢 ABRIR PEDIDO"):
+        st.session_state.mostrar_formulario = not st.session_state.mostrar_formulario
+
+    if st.session_state.mostrar_formulario:
+        with st.form("form_novo_pedido"):
+            st.subheader("📋 Novo Pedido")
+            cliente = st.text_input("Cliente")
+            produtos = st.text_input("Produtos (separados por vírgula)")
+            total = st.number_input("Total (Gs)", step=1000.0, min_value=0.0)
+            status = st.selectbox("Status", ["Aguardando", "Em Preparo", "Finalizado"])
+            data = st.date_input("Data do Pedido")
+            enviar = st.form_submit_button("Registrar Pedido")
+
+            if enviar:
+                if cliente and produtos:
+                    try:
+                        supabase.table("pedidos").insert({
+                            "cliente": cliente,
+                            "produtos": produtos,
+                            "total": total,
+                            "status": status,
+                            "data": str(data)
+                        }).execute()
+                        st.success("Pedido registrado com sucesso!")
+                        st.session_state.mostrar_formulario = False
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Erro ao registrar pedido: {e}")
+                else:
+                    st.warning("Preencha todos os campos obrigatórios.")
 
     try:
         pedidos = supabase.table("pedidos").select("*").order("id", desc=True).execute().data
