@@ -36,32 +36,35 @@ def show_pedidos():
             st.caption("Nenhum pedido nesta categoria.")
             continue
 
-        colunas = st.columns(3)  # 3 cards por linha
+        colunas = st.columns(3)
 
         for i, pedido in enumerate(filtrados):
             with colunas[i % 3]:
-                st.markdown(
-                    f'''
+                with st.container():
+                    st.markdown(
+                        f'''
 <div style="border:1px solid #444; border-radius:10px; padding:1rem; margin-bottom:1rem; background-color:#1f2937;">
 <strong>Cliente:</strong> {pedido.get("cliente", "")}<br>
 <strong>Total:</strong> {pedido.get("total", "")}<br>
 <strong>Status:</strong> {pedido.get("status", "")}<br>
 <strong>Data:</strong> {pedido.get("data", "")}<br>
-<strong>Produtos:</strong> {pedido.get("produtos", "")}
+<strong>Produtos:</strong> {pedido.get("produtos", "")}<br><br>
 </div>
-                    ''',
-                    unsafe_allow_html=True
-                )
-                novo_status = st.selectbox(
-                    "Alterar Status",
-                    ["Aguardando", "Em Preparo", "Finalizado"],
-                    index=["Aguardando", "Em Preparo", "Finalizado"].index(pedido["status"]),
-                    key=f"status_{pedido['id']}"
-                )
-                if novo_status != pedido["status"]:
-                    try:
-                        supabase.table("pedidos").update({"status": novo_status}).eq("id", pedido["id"]).execute()
-                        st.success("Status atualizado!")
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Erro ao atualizar status: {e}")
+                        ''',
+                        unsafe_allow_html=True
+                    )
+
+                    novo_status = st.selectbox(
+                        "Alterar Status",
+                        ["Aguardando", "Em Preparo", "Finalizado"],
+                        index=["Aguardando", "Em Preparo", "Finalizado"].index(pedido["status"]),
+                        key=f"status_{pedido['id']}"
+                    )
+
+                    if novo_status != pedido["status"]:
+                        try:
+                            supabase.table("pedidos").update({"status": novo_status}).eq("id", pedido["id"]).execute()
+                            st.success("Status atualizado!")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Erro ao atualizar status: {e}")
