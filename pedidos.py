@@ -27,13 +27,14 @@ def show_pedidos():
                 st.error(f"Erro ao buscar produtos: {e}")
                 return
 
-            nomes = [f"{p['nome']} - {p['preco']}" for p in lista_produtos]
-            nome_para_produto = {f"{p['nome']} - {p['preco']}": p for p in lista_produtos}
+            nomes = [f"{p['nome']} - R${p['preco']:.2f}" for p in lista_produtos]
+            nome_para_produto = {f"{p['nome']} - R${p['preco']:.2f}": p for p in lista_produtos}
 
             col1, col2 = st.columns([3, 1])
             with col1:
                 produto_selecionado = st.selectbox("Selecionar Produto", nomes)
             with col2:
+                st.markdown("<div style='margin-top: 2rem'></div>", unsafe_allow_html=True)
                 if st.form_submit_button("Adicionar"):
                     if produto_selecionado and produto_selecionado not in st.session_state.itens_selecionados:
                         st.session_state.itens_selecionados.append(produto_selecionado)
@@ -43,9 +44,9 @@ def show_pedidos():
                 st.markdown("### 🧾 Produtos Selecionados")
                 for item in st.session_state.itens_selecionados:
                     produto = nome_para_produto[item]
-                    st.markdown(f"- {produto['nome']} – `{produto['preco']} Gs`")
+                    st.markdown(f"- {produto['nome']} – <span style='color:limegreen;'>R${produto['preco']:.2f}</span>", unsafe_allow_html=True)
                     total += produto["preco"]
-                st.markdown(f"### 💰 Total: `{total}` Gs")
+                st.markdown(f"### 💰 <strong>Total: <span style='background-color:#16a34a; color:white; padding:4px 8px; border-radius:6px;'>R${total:.2f}</span></strong>", unsafe_allow_html=True)
             else:
                 st.info("Nenhum produto adicionado ainda.")
 
@@ -105,7 +106,7 @@ def show_pedidos():
             with colunas[i % 3]:
                 with st.container(border=True):
                     st.markdown(f"**Cliente:** {pedido.get('cliente', '')}")
-                    st.markdown(f"**Total:** {pedido.get('total', '')}")
+                    st.markdown(f"**Total:** R${pedido.get('total', 0):.2f}")
                     st.markdown(f"**Status:** {pedido.get('status', '')}")
                     st.markdown(f"**Data:** {pedido.get('data', '')}")
                     st.markdown(f"**Produtos:** {pedido.get('produtos', '')}")
