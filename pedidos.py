@@ -18,8 +18,6 @@ def show_pedidos():
         st.info("Nenhum pedido cadastrado.")
         return
 
-    st.subheader("📤 Exportar todos os pedidos")
-    export_csv(pedidos, "todos_pedidos.csv")
     st.markdown("---")
 
     categorias = {
@@ -60,3 +58,7 @@ def show_pedidos():
                             st.rerun()
                         except Exception as e:
                             st.error(f"Erro ao atualizar status: {e}")
+
+    st.markdown("---")
+    st.subheader("📤 Exportar todos os pedidos")
+    export_csv(pedidos, "todos_pedidos.csv")
