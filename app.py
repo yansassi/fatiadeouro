@@ -5,7 +5,11 @@ import pedidos
 
 st.set_page_config(page_title="Fatia de Ouro", layout="wide")
 
-# Estilo corrigido com padding superior na sidebar para não cortar a logo
+# Inicializar estado do menu se não existir
+if "sidebar_expandida" not in st.session_state:
+    st.session_state.sidebar_expandida = True
+
+# CSS atualizado para barra lateral com botão de toggle
 st.markdown("""
 <style>
 body {
@@ -23,6 +27,7 @@ body {
     padding-top: 3.5rem;
     border-right: 1px solid #2c2f3a;
     z-index: 1000;
+    transition: width 0.3s ease-in-out;
 }
 .sidebar-container h2 {
     color: white;
@@ -50,22 +55,59 @@ body {
     margin-left: 240px;
     padding: 4rem 2rem 2rem 2rem;
 }
+.toggle-container {
+    position: fixed;
+    top: 45%;
+    left: 220px;
+    z-index: 1001;
+    transform: translateY(-50%);
+}
+.toggle-button {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 0.5rem 0.7rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+}
 </style>
-<div class="sidebar-container">
-    <h2>🍕 Fatia de Ouro</h2>
-    <form action="" method="get">
-        <button name="page" value="Clientes" class="sidebar-button">👤 Clientes</button>
-        <button name="page" value="Produtos" class="sidebar-button">📦 Produtos</button>
-        <button name="page" value="Pedidos" class="sidebar-button">🧾 Pedidos</button>
-    </form>
-</div>
 """, unsafe_allow_html=True)
 
-# Página ativa
+# Botão para recolher a barra lateral
+with st.container():
+    toggle_html = f'''
+    <div class="toggle-container">
+        <form action="" method="get">
+            <button name="toggle" value="1" class="toggle-button">{'⏴' if st.session_state.sidebar_expandida else '⏵'}</button>
+        </form>
+    </div>
+    '''
+    st.markdown(toggle_html, unsafe_allow_html=True)
+
+# Alternar visibilidade da sidebar
 query_params = st.query_params
+if "toggle" in query_params:
+    st.session_state.sidebar_expandida = not st.session_state.sidebar_expandida
+
+# Mostrar sidebar apenas se estiver expandida
+if st.session_state.sidebar_expandida:
+    st.markdown("""
+    <div class="sidebar-container">
+        <h2>🍕 Fatia de Ouro</h2>
+        <form action="" method="get">
+            <button name="page" value="Clientes" class="sidebar-button">👤 Clientes</button>
+            <button name="page" value="Produtos" class="sidebar-button">📦 Produtos</button>
+            <button name="page" value="Pedidos" class="sidebar-button">🧾 Pedidos</button>
+        </form>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Página ativa
 page = query_params.get("page", "Clientes")
 
-# Conteúdo com margem para o novo topo
+# Conteúdo principal
 st.markdown('<div class="main-container">', unsafe_allow_html=True)
 st.title(page)
 
